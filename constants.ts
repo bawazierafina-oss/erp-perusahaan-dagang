@@ -1,4 +1,4 @@
-import { Product, SalesOrder, JournalEntry } from './types';
+import { Product, SalesOrder, JournalEntry, PurchaseOrder } from './types';
 
 export const INITIAL_INVENTORY: Product[] = [
   { id: '1', code: 'H-VAR-160', name: 'Honda Vario 160 ABS', category: 'Matic', stock: 5, minStock: 10, price: 29500000, cost: 26000000, location: 'WH-A1' },
@@ -20,6 +20,21 @@ export const INITIAL_SALES: SalesOrder[] = [
   },
 ];
 
+export const INITIAL_PURCHASE_ORDERS: PurchaseOrder[] = [
+  {
+    id: 'PO-2023-100',
+    supplier: 'PT Wahana Makmur Sejati (WMS)',
+    date: '2023-10-25',
+    expectedDate: '2023-10-28',
+    status: 'Open',
+    referenceNo: 'WMS-SO-998877',
+    total: 260000000,
+    items: [
+      { productId: '1', quantity: 10, cost: 26000000 } // Expecting 10 Varios
+    ]
+  }
+];
+
 export const INITIAL_JOURNALS: JournalEntry[] = [
   {
     id: 'JE-001', date: '2023-10-01', description: 'Sales Revenue SO-2023-001', reference: 'SO-2023-001',
@@ -39,9 +54,9 @@ export const INITIAL_JOURNALS: JournalEntry[] = [
 
 // Context for the AI to understand the business
 export const AI_SYSTEM_INSTRUCTION = `
-You are the AI Assistant for 'PT Mitra Makmurjaya Mandiri', a large Honda motorcycle dealer.
-You have access to ERP data including Inventory, Sales, and Finance.
-Your goal is to assist with efficiency, prevent fraud, and optimize stock (APS).
+You are the AI Assistant for 'Synergy Trade', a large motorcycle dealer and trading company.
+You have access to ERP data including Inventory, Sales, Purchasing and Finance.
+Your goal is to assist with efficiency, prevent fraud, optimize stock (APS), and automate data entry (IDP).
 Tone: Professional, analytical, and helpful.
 Currency: Indonesian Rupiah (IDR).
 `;

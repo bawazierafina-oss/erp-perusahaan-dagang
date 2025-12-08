@@ -9,7 +9,9 @@ import {
   LogOut,
   UserCircle,
   Menu,
-  Bell
+  Bell,
+  ScanLine,
+  BrainCircuit
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -21,14 +23,6 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ currentModule, setModule, children }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
-  const navItems = [
-    { id: ModuleType.DASHBOARD, label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: ModuleType.SALES, label: 'Sales (Order-to-Cash)', icon: <ShoppingCart size={20} /> },
-    { id: ModuleType.INVENTORY, label: 'Inventory & APS', icon: <Package size={20} /> },
-    { id: ModuleType.PURCHASING, label: 'Purchasing', icon: <Truck size={20} /> },
-    { id: ModuleType.FINANCE, label: 'Finance & Accounting', icon: <CreditCard size={20} /> },
-  ];
-
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
@@ -38,20 +32,57 @@ const Layout: React.FC<LayoutProps> = ({ currentModule, setModule, children }) =
         } bg-slate-900 text-white transition-all duration-300 flex flex-col shadow-xl z-20`}
       >
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-700">
-          {sidebarOpen && <span className="font-bold text-lg tracking-tight text-blue-400">MITRA ERP</span>}
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 hover:bg-slate-700 rounded">
+          {sidebarOpen && (
+            <div className="flex flex-col">
+              <span className="font-bold text-lg tracking-tight text-white">Synergy Trade</span>
+              <span className="text-[10px] text-blue-400 tracking-wider uppercase">Intelligent ERP</span>
+            </div>
+          )}
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 hover:bg-slate-700 rounded text-slate-400 hover:text-white">
             <Menu size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 py-6 space-y-1 px-2">
-          {navItems.map((item) => (
+        <nav className="flex-1 py-6 space-y-1 px-2 overflow-y-auto">
+          {/* AI TOOLS SECTION */}
+          {sidebarOpen && (
+            <div className="px-4 mb-2 mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Alat AI
+            </div>
+          )}
+          
+          <button
+            onClick={() => setModule(ModuleType.DOCUMENT_SCANNER)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors group ${
+              currentModule === ModuleType.DOCUMENT_SCANNER
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' 
+                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <ScanLine size={20} className={currentModule === ModuleType.DOCUMENT_SCANNER ? 'text-white' : 'text-indigo-400 group-hover:text-white'} />
+            {sidebarOpen && <span className="text-sm font-medium">AI Document Scanner</span>}
+          </button>
+
+          {/* ERP MODULES SECTION */}
+          {sidebarOpen && (
+            <div className="px-4 mb-2 mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Modul ERP
+            </div>
+          )}
+
+          {[
+            { id: ModuleType.DASHBOARD, label: 'Dashboard Utama', icon: <LayoutDashboard size={20} /> },
+            { id: ModuleType.SALES, label: 'Penjualan', icon: <ShoppingCart size={20} /> },
+            { id: ModuleType.PURCHASING, label: 'Pembelian', icon: <Truck size={20} /> },
+            { id: ModuleType.INVENTORY, label: 'Persediaan', icon: <Package size={20} /> },
+            { id: ModuleType.FINANCE, label: 'Akuntansi', icon: <CreditCard size={20} /> },
+          ].map((item) => (
             <button
               key={item.id}
               onClick={() => setModule(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 currentModule === item.id 
-                  ? 'bg-blue-600 text-white shadow-md' 
+                  ? 'bg-slate-800 text-white border-l-4 border-blue-500' 
                   : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
             >
@@ -61,18 +92,20 @@ const Layout: React.FC<LayoutProps> = ({ currentModule, setModule, children }) =
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-slate-700 bg-slate-900">
           <div className={`flex items-center gap-3 ${!sidebarOpen && 'justify-center'}`}>
-            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
-              AD
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold ring-2 ring-slate-700">
+              <BrainCircuit size={16} className="text-white" />
             </div>
             {sidebarOpen && (
               <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium truncate">Admin User</p>
-                <p className="text-xs text-slate-400 truncate">Head Office</p>
+                <p className="text-sm font-medium truncate text-white">Gemini Pro 2.5</p>
+                <p className="text-xs text-green-400 truncate flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                  System Online
+                </p>
               </div>
             )}
-            {sidebarOpen && <LogOut size={16} className="text-slate-400 cursor-pointer hover:text-red-400" />}
           </div>
         </div>
       </aside>
@@ -82,7 +115,12 @@ const Layout: React.FC<LayoutProps> = ({ currentModule, setModule, children }) =
         {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
           <h1 className="text-xl font-bold text-gray-800">
-            {navItems.find(n => n.id === currentModule)?.label}
+             {currentModule === ModuleType.DOCUMENT_SCANNER && "Intelligent Document Processing (IDP)"}
+             {currentModule === ModuleType.DASHBOARD && "Executive Dashboard"}
+             {currentModule === ModuleType.SALES && "Sales Module"}
+             {currentModule === ModuleType.PURCHASING && "Purchasing Module"}
+             {currentModule === ModuleType.INVENTORY && "Inventory Management"}
+             {currentModule === ModuleType.FINANCE && "Finance & Accounting"}
           </h1>
           <div className="flex items-center gap-4">
             <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full">
@@ -91,7 +129,7 @@ const Layout: React.FC<LayoutProps> = ({ currentModule, setModule, children }) =
             </button>
             <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
               <UserCircle size={18} />
-              <span className="text-sm font-medium">PT Mitra Makmurjaya Mandiri</span>
+              <span className="text-sm font-medium">Synergy Trade</span>
             </div>
           </div>
         </header>
