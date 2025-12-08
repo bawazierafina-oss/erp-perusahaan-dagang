@@ -3,7 +3,12 @@ import { AI_SYSTEM_INSTRUCTION } from "../constants.ts";
 import { Product, SalesOrder, ApsForecast } from "../types.ts";
 
 // Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Check if API Key is set correctly
+const apiKey = process.env.API_KEY;
+if (!apiKey || apiKey === "__API_KEY__") {
+  console.error("CRITICAL: API_KEY is missing or invalid. Please check netlify.toml or local configuration.");
+}
+const ai = new GoogleGenAI({ apiKey: apiKey || "" });
 
 const MODEL_FAST = 'gemini-2.5-flash';
 
@@ -31,7 +36,7 @@ export const runApsAnalysis = async (inventory: Product[], salesHistory: SalesOr
 
     const response = await ai.models.generateContent({
       model: MODEL_FAST,
-      contents: prompt,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         systemInstruction: AI_SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
@@ -71,7 +76,7 @@ export const auditTransaction = async (transactionData: any): Promise<{ safe: bo
   try {
     const response = await ai.models.generateContent({
       model: MODEL_FAST,
-      contents: `Audit this transaction for fraud risk or anomalies: ${JSON.stringify(transactionData)}`,
+      contents: [{ role: 'user', parts: [{ text: `Audit this transaction for fraud risk or anomalies: ${JSON.stringify(transactionData)}` }] }],
       config: {
         systemInstruction: "You are an Internal Audit AI. Analyze for fraud, unusual amounts, or policy violations.",
         responseMimeType: "application/json",
@@ -169,27 +174,27 @@ const IDP_RESPONSE_SCHEMA: Schema = {
       description: "Field utama dokumen (Header)",
       properties: {
         // Transaksi / Umum
-        nomor_surat_jalan: { type: Type.STRING },
-        tanggal: { type: Type.STRING },
-        nama_customer: { type: Type.STRING },
-        nama_supplier: { type: Type.STRING },
-        alamat: { type: Type.STRING },
-        no_po: { type: Type.STRING },
-        no_invoice: { type: Type.STRING },
-        total_transaksi: { type: Type.NUMBER },
+        nomor_surat_jalan: { type: Type.STRING, nullable: true },
+        tanggal: { type: Type.STRING, nullable: true },
+        nama_customer: { type: Type.STRING, nullable: true },
+        nama_supplier: { type: Type.STRING, nullable: true },
+        alamat: { type: Type.STRING, nullable: true },
+        no_po: { type: Type.STRING, nullable: true },
+        no_invoice: { type: Type.STRING, nullable: true },
+        total_transaksi: { type: Type.NUMBER, nullable: true },
         
         // Identitas (KTP)
-        nik: { type: Type.STRING },
-        nama_lengkap: { type: Type.STRING },
-        tempat_tanggal_lahir: { type: Type.STRING },
-        jenis_kelamin: { type: Type.STRING },
-        alamat_identitas: { type: Type.STRING },
-        rt_rw: { type: Type.STRING },
-        kelurahan: { type: Type.STRING },
-        kecamatan: { type: Type.STRING },
-        agama: { type: Type.STRING },
-        status_perkawinan: { type: Type.STRING },
-        pekerjaan: { type: Type.STRING },
+        nik: { type: Type.STRING, nullable: true },
+        nama_lengkap: { type: Type.STRING, nullable: true },
+        tempat_tanggal_lahir: { type: Type.STRING, nullable: true },
+        jenis_kelamin: { type: Type.STRING, nullable: true },
+        alamat_identitas: { type: Type.STRING, nullable: true },
+        rt_rw: { type: Type.STRING, nullable: true },
+        kelurahan: { type: Type.STRING, nullable: true },
+        kecamatan: { type: Type.STRING, nullable: true },
+        agama: { type: Type.STRING, nullable: true },
+        status_perkawinan: { type: Type.STRING, nullable: true },
+        pekerjaan: { type: Type.STRING, nullable: true },
       }
     },
     table_data: {
@@ -198,15 +203,15 @@ const IDP_RESPONSE_SCHEMA: Schema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          kode_barang: { type: Type.STRING },
-          nama_barang: { type: Type.STRING },
-          qty: { type: Type.NUMBER },
-          satuan: { type: Type.STRING },
-          harga_satuan: { type: Type.NUMBER },
-          subtotal: { type: Type.NUMBER },
+          kode_barang: { type: Type.STRING, nullable: true },
+          nama_barang: { type: Type.STRING, nullable: true },
+          qty: { type: Type.NUMBER, nullable: true },
+          satuan: { type: Type.STRING, nullable: true },
+          harga_satuan: { type: Type.NUMBER, nullable: true },
+          subtotal: { type: Type.NUMBER, nullable: true },
           // Field Spesifik Otomotif (Synergy Trade)
-          nomor_rangka: { type: Type.STRING },
-          nomor_mesin: { type: Type.STRING }
+          nomor_rangka: { type: Type.STRING, nullable: true },
+          nomor_mesin: { type: Type.STRING, nullable: true }
         }
       }
     },
@@ -234,64 +239,5 @@ export const extractDocumentData = async (
         const lowerMime = mimeType.toLowerCase();
         if (lowerMime.includes('csv') || lowerMime.includes('text') || lowerMime.includes('json')) {
            try {
-             const textContent = atob(fileBase64);
-             parts.push({ text: "Berikut adalah isi dokumen dalam format Teks/CSV:\n" + textContent });
-           } catch (e) {
-             parts.push({ inlineData: { mimeType: mimeType, data: fileBase64 } });
-           }
-        } else if (lowerMime.includes('spreadsheet') || lowerMime.includes('excel')) {
-             throw new Error("Untuk file Excel, mohon simpan sebagai CSV atau PDF agar terbaca optimal.");
-        } else {
-             // Images & PDFs
-             parts.push({ inlineData: { mimeType: mimeType, data: fileBase64 } });
-        }
-        
-        // Add User Prompt (Hint)
-        const userPrompt = docTypeHint 
-          ? `Konteks tambahan dari user: Dokumen ini mungkin adalah ${docTypeHint}. Lakukan ekstraksi sesuai instruksi.` 
-          : `Identifikasi jenis dokumen ini secara otomatis dan ekstrak seluruh data.`;
-
-        parts.push({ text: userPrompt });
-
-        const response = await ai.models.generateContent({
-            model: MODEL_FAST,
-            contents: { parts },
-            config: {
-                systemInstruction: IDP_SYSTEM_PROMPT,
-                responseMimeType: "application/json",
-                responseSchema: IDP_RESPONSE_SCHEMA
-            }
-        });
-
-        if (response.text) {
-            return JSON.parse(response.text);
-        }
-        throw new Error("Gagal mengekstrak data dari dokumen.");
-
-    } catch (error: any) {
-        console.error("IDP Error:", error);
-        if (error.message.includes("Excel")) throw error;
-        throw new Error("Ekstraksi gagal. Pastikan file berupa Gambar Jelas, PDF, atau CSV.");
-    }
-}
-
-/**
- * General Chat Assistant
- */
-export const chatWithAssistant = async (message: string, contextData: string): Promise<string> => {
-  try {
-    const chat = ai.chats.create({
-      model: MODEL_FAST,
-      config: { systemInstruction: AI_SYSTEM_INSTRUCTION }
-    });
-
-    const response = await chat.sendMessage({ 
-      message: `Context Data: ${contextData}\n\nUser Query: ${message}` 
-    });
-
-    return response.text || "Mohon maaf, saya tidak dapat memproses permintaan saat ini.";
-  } catch (error) {
-    console.error("Chat Error:", error);
-    return "Sistem sedang offline. Silakan coba lagi nanti.";
-  }
-};
+             // Basic Base64 decoding for text
+             const textContent = atob(fileBase
