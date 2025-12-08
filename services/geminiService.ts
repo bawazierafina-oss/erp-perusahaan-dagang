@@ -240,4 +240,67 @@ export const extractDocumentData = async (
         if (lowerMime.includes('csv') || lowerMime.includes('text') || lowerMime.includes('json')) {
            try {
              // Basic Base64 decoding for text
-             const textContent = atob(fileBase
+             const textContent = atob(fileBase64);
+             parts.push({ text: "Berikut adalah isi dokumen dalam format Teks/CSV:\n" + textContent });
+           } catch (e) {
+             console.warn("Text decoding failed, falling back to inline data", e);
+             parts.push({ inlineData: { mimeType: mimeType, data: fileBase64 } });
+           }
+        } else if (lowerMime.includes('spreadsheet') || lowerMime.includes('excel')) {
+             throw new Error("Untuk file Excel, mohon simpan sebagai CSV atau PDF agar terbaca optimal.");
+        } else {
+             // Images & PDFs
+             // Gemini supports image/jpeg, image/png, application/pdf
+             parts.push({ inlineData: { mimeType: mimeType, data: fileBase64 } });
+        }
+        
+        // Add User Prompt (Hint)
+        const userPrompt = docTypeHint 
+          ? `Konteks tambahan dari user: Dokumen ini mungkin adalah ${docTypeHint}. Lakukan ekstraksi sesuai instruksi.` 
+          : `Identifikasi jenis dokumen ini secara otomatis dan ekstrak seluruh data.`;
+
+        parts.push({ text: userPrompt });
+
+        // Using canonical contents structure: [{ role: 'user', parts: [...] }]
+        const response = await ai.models.generateContent({
+            model: MODEL_FAST,
+            contents: [{ role: 'user', parts: parts }],
+            config: {
+                systemInstruction: IDP_SYSTEM_PROMPT,
+                responseMimeType: "application/json",
+                responseSchema: IDP_RESPONSE_SCHEMA
+            }
+        });
+
+        if (response.text) {
+            return JSON.parse(response.text);
+        }
+        throw new Error("Gagal mengekstrak data dari dokumen (Response Empty).");
+
+    } catch (error: any) {
+        console.error("IDP Error Full:", error);
+        if (error.message && error.message.includes("Excel")) throw error;
+        throw new Error(`Ekstraksi gagal: ${error.message || "Internal Error"}`);
+    }
+}
+
+/**
+ * General Chat Assistant
+ */
+export const chatWithAssistant = async (message: string, contextData: string): Promise<string> => {
+  try {
+    const chat = ai.chats.create({
+      model: MODEL_FAST,
+      config: { systemInstruction: AI_SYSTEM_INSTRUCTION }
+    });
+
+    const response = await chat.sendMessage({ 
+      message: `Context Data: ${contextData}\n\nUser Query: ${message}` 
+    });
+
+    return response.text || "Mohon maaf, saya tidak dapat memproses permintaan saat ini.";
+  } catch (error) {
+    console.error("Chat Error:", error);
+    return "Sistem sedang offline. Silakan coba lagi nanti.";
+  }
+};
