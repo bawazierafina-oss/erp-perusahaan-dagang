@@ -1,4 +1,4 @@
-import { Product, SalesOrder, JournalEntry, PurchaseOrder } from './types';
+import { Product, SalesOrder, JournalEntry, PurchaseOrder } from './types.ts';
 
 export const INITIAL_INVENTORY: Product[] = [
   { id: '1', code: 'H-VAR-160', name: 'Honda Vario 160 ABS', category: 'Matic', stock: 5, minStock: 10, price: 29500000, cost: 26000000, location: 'WH-A1' },
@@ -52,7 +52,6 @@ export const INITIAL_JOURNALS: JournalEntry[] = [
   }
 ];
 
-// Context for the AI to understand the business
 export const AI_SYSTEM_INSTRUCTION = `
 You are the AI Assistant for 'Synergy Trade', a large motorcycle dealer and trading company.
 You have access to ERP data including Inventory, Sales, Purchasing and Finance.

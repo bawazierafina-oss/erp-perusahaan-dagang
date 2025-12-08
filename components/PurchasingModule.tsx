@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { PurchaseOrder, ReceivingReport, Product } from '../types';
-import { extractDocumentData } from '../services/geminiService';
+import { PurchaseOrder, ReceivingReport, Product } from '../types.ts';
+import { extractDocumentData } from '../services/geminiService.ts';
 import { Upload, FileText, CheckCircle, Loader, AlertCircle, ScanLine, ArrowRight } from 'lucide-react';
 
 interface Props {

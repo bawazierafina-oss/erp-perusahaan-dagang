@@ -1,5 +1,5 @@
 import React from 'react';
-import { SalesOrder, Product } from '../types';
+import { SalesOrder, Product } from '../types.ts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { DollarSign, Package, ShoppingBag, Activity } from 'lucide-react';
 

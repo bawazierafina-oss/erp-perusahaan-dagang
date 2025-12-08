@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
-import { AI_SYSTEM_INSTRUCTION } from "../constants";
-import { Product, SalesOrder, ApsForecast } from "../types";
+import { AI_SYSTEM_INSTRUCTION } from "../constants.ts";
+import { Product, SalesOrder, ApsForecast } from "../types.ts";
 
 // Initialize Gemini Client
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });

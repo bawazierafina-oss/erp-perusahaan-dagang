@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Product, SalesOrder, JournalEntry } from '../types';
+import { Product, SalesOrder, JournalEntry } from '../types.ts';
 import { Plus, Save, FileText, Check } from 'lucide-react';
-import { auditTransaction } from '../services/geminiService';
+import { auditTransaction } from '../services/geminiService.ts';
 
 interface Props {
   inventory: Product[];

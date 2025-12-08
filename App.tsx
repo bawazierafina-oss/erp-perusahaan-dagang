@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import Layout from './components/Layout';
-import { ModuleType, Product, SalesOrder, JournalEntry, PurchaseOrder, ReceivingReport } from './types';
-import { INITIAL_INVENTORY, INITIAL_SALES, INITIAL_JOURNALS, INITIAL_PURCHASE_ORDERS } from './constants';
-import InventoryAPS from './components/InventoryAPS';
-import SalesModule from './components/SalesModule';
-import FinanceModule from './components/FinanceModule';
-import PurchasingModule from './components/PurchasingModule';
-import DocumentScanner from './components/DocumentScanner';
-import Dashboard from './components/Dashboard';
-import AIChatWidget from './components/AIChatWidget';
+import Layout from './components/Layout.tsx';
+import { ModuleType, Product, SalesOrder, JournalEntry, PurchaseOrder, ReceivingReport } from './types.ts';
+import { INITIAL_INVENTORY, INITIAL_SALES, INITIAL_JOURNALS, INITIAL_PURCHASE_ORDERS } from './constants.ts';
+import InventoryAPS from './components/InventoryAPS.tsx';
+import SalesModule from './components/SalesModule.tsx';
+import FinanceModule from './components/FinanceModule.tsx';
+import PurchasingModule from './components/PurchasingModule.tsx';
+import DocumentScanner from './components/DocumentScanner.tsx';
+import Dashboard from './components/Dashboard.tsx';
+import AIChatWidget from './components/AIChatWidget.tsx';
 
 const App: React.FC = () => {
   const [currentModule, setCurrentModule] = useState<ModuleType>(ModuleType.DASHBOARD);

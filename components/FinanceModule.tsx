@@ -1,5 +1,5 @@
 import React from 'react';
-import { JournalEntry } from '../types';
+import { JournalEntry } from '../types.ts';
 import { FileSpreadsheet, Search } from 'lucide-react';
 
 interface Props {

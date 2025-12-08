@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot } from 'lucide-react';
-import { ChatMessage } from '../types';
-import { chatWithAssistant } from '../services/geminiService';
+import { ChatMessage } from '../types.ts';
+import { chatWithAssistant } from '../services/geminiService.ts';
 
 interface Props {
   contextData: string; // Serialized string of current state

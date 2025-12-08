@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Product, ApsForecast, SalesOrder } from '../types';
-import { runApsAnalysis } from '../services/geminiService';
+import { Product, ApsForecast, SalesOrder } from '../types.ts';
+import { runApsAnalysis } from '../services/geminiService.ts';
 import { AlertTriangle, TrendingUp, RefreshCw, CheckCircle, Package } from 'lucide-react';
 
 interface Props {

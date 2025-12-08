@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { extractDocumentData } from '../services/geminiService';
+import { extractDocumentData } from '../services/geminiService.ts';
 import { Upload, ScanLine, FileText, Check, Loader, Copy, UserSquare, Truck, FileSpreadsheet, AlertTriangle, Table } from 'lucide-react';
 
 const DocumentScanner: React.FC = () => {

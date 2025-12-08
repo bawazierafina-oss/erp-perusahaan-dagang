@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModuleType } from '../types';
+import { ModuleType } from '../types.ts';
 import { 
   LayoutDashboard, 
   ShoppingCart, 
